@@ -1,66 +1,37 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { supabase } from '@/lib/supabase';
 
-export default function Home() {
+export default async function Home() {
+  const { data: polls } = await supabase
+    .from('polls')
+    .select('*, options(count)');
+
+  const mockPolls = [
+    { id: 1, question: 'Favorite Programming Language?', totalVotes: 156 },
+    { id: 2, question: 'Best Frontend Framework?', totalVotes: 89 },
+    { id: 3, question: 'Coffee or Tea?', totalVotes: 245 },
+    { id: 4, question: 'Dark Mode or Light Mode?', totalVotes: 312 }
+  ];
+
+  const displayPolls = (polls && polls.length > 0) ? polls : mockPolls;
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
+    <div className="hero">
+      <h1 style={{ fontSize: '3.5rem', fontWeight: '900', letterSpacing: '-2px' }}>
+        Global <span style={{ color: 'var(--accent)' }}>Polling</span>
+      </h1>
+      <p style={{ color: '#64748b', marginTop: '12px' }}>Vote on trends or create your own social poll.</p>
+
+      <div className="poll-grid">
+        {displayPolls.map((poll) => (
+          <a key={poll.id} href={`/poll/${poll.id}`} className="poll-card">
+            <h3>{poll.question}</h3>
+            <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{poll.totalVotes || 0} votes</span>
+                <span style={{ color: 'var(--accent)', fontWeight: '600' }}>Vote Now →</span>
+            </div>
           </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        ))}
+      </div>
     </div>
   );
 }
